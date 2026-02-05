@@ -1,0 +1,58 @@
+# AI_README — START HERE
+
+If you are an AI coding agent or engineer working inside this repository, read the following documents BEFORE making architectural decisions:
+
+1. LOTSHOPPR_CONTEXT.md → Platform intent and system philosophy  
+2. /docs/architecture.md → System structure and boundaries  
+3. /docs/data-model.md → Source of truth for entities  
+
+---
+
+## 🚨 Non-Negotiable Engineering Rules
+
+- Do NOT introduce microservices during MVP.
+- Do NOT couple UI logic to backend services.
+- Do NOT hardcode dealer-specific workflows.
+- Prefer modular, replaceable components.
+- Keep services stateless when possible.
+- Normalize data aggressively.
+- Business logic belongs in services — NOT routes.
+
+---
+
+## Strategic Reminder
+
+LotShoppr is a **negotiation intelligence platform**, NOT a vehicle listing marketplace.
+
+The system is being built to become the decision layer between buyers and dealerships.
+
+When making architecture decisions, optimize for:
+
+- automation  
+- data leverage  
+- negotiation intelligence  
+- scalability  
+- replaceability  
+
+---
+
+## When Uncertain
+
+Prefer:
+
+✔ simplicity  
+✔ structured data  
+✔ modular services  
+✔ replaceable infrastructure  
+
+Avoid unnecessary complexity.
+
+---
+
+## Critical Boundary
+
+Controllers handle HTTP.  
+Services contain business logic.  
+Routes stay thin.  
+
+Never blur these lines.
