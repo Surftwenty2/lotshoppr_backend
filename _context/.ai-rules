@@ -1,0 +1,19 @@
+SYSTEM RULES FOR AI CONTRIBUTORS
+
+Do not introduce microservices.
+
+Do not place business logic inside routes or controllers.
+
+Business logic belongs in services.
+
+Prefer extending existing patterns instead of inventing new architecture.
+
+Preserve schema stability. Treat schema drift as a bug.
+
+Normalize structured data whenever possible.
+
+Avoid dealer-specific branching logic — prefer configuration-driven approaches.
+
+Optimize for long-term negotiation intelligence, not short-term hacks.
+
+When uncertain, choose the simplest architecture that preserves future optionality.

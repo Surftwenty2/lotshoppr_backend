@@ -1,0 +1,16 @@
+./_context/tree.txt
+./.ai-rules
+./.env.example
+./.github/copilot-instructions.md
+./AI_README
+./COPILOT.md
+./docs/architecture.md
+./docs/data-model.md
+./LOTSHOPPR_CONTEXT.md
+./package.json
+./README.md
+./src/.env.example
+./src/emailTemplates.ts
+./src/logic.ts
+./src/server.ts
+./tsconfig.json

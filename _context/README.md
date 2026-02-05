@@ -1,4 +1,3 @@
-⚠️ Engineers and AI agents: Start with AI_README.md before making architectural changes.
 # LotShoppr Backend (MVP)
 
 Minimal backend to:
