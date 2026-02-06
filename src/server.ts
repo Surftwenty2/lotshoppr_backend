@@ -1,4 +1,11 @@
 import "dotenv/config";
+
+// Debug: Check if OpenAI API key is present at startup (do not log the full key)
+if (process.env.OPENAI_API_KEY) {
+  console.log('[DEBUG] OPENAI_API_KEY is set (length:', process.env.OPENAI_API_KEY.length, ')');
+} else {
+  console.warn('[WARN] OPENAI_API_KEY is NOT set!');
+}
 import express from "express";
 import bodyParser from "body-parser";
 import { parseDealerEmail, evaluateOffer, buildFollowupEmail } from "./logic";
