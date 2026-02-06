@@ -15,6 +15,7 @@ export interface CustomerCriteria {
   maxPrice: number;
   toleranceAboveTarget: number;
   timelineDescription: string; // e.g. "the next couple of weeks"
+  dealType?: 'lease' | 'finance' | 'cash';
 }
 
 export interface Dealer {
