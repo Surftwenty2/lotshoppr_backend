@@ -24,6 +24,9 @@ export interface DealerOffer {
   expirationDate?: string | null;
   stockNumber?: string | null;
   vin?: string | null;
+  incentives?: string | null;
+  rebates?: string | null;
+  dealerAddOns?: string | null;
   rawText: string;
 }
 
@@ -73,6 +76,45 @@ function estimateOtd(offer: DealerOffer): number | null {
   return base + doc + other + tax;
 }
 
+function calculateMonthlyPayment(principal: number, rate: number, months: number): number {
+  const monthlyRate = rate / 12 / 100;
+  return (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+}
+
+function analyzeDealerTactics(text: string): string[] {
+  const tactics = [];
+  const lowerText = text.toLowerCase();
+
+  if (lowerText.includes("hidden fees")) {
+    tactics.push("Hidden fees detected");
+  }
+  if (lowerText.includes("marked-up interest")) {
+    tactics.push("Marked-up interest rate detected");
+  }
+  if (lowerText.includes("add-ons")) {
+    tactics.push("Unnecessary add-ons suggested");
+  }
+
+  return tactics;
+}
+
+function adjustForRegionalNuances(region: string, text: string): string {
+  const regionalAdjustments: Record<string, string[]> = {
+    "California": ["emissions standards", "zero-emission vehicles"],
+    "Texas": ["truck incentives", "pickup trucks"],
+    "New York": ["city driving", "compact cars"],
+  };
+
+  const adjustments = regionalAdjustments[region] || [];
+  for (const adjustment of adjustments) {
+    if (text.toLowerCase().includes(adjustment.toLowerCase())) {
+      return `Based on regional preferences in ${region}, consider emphasizing ${adjustment}.`;
+    }
+  }
+
+  return "No specific regional adjustments needed.";
+}
+
 export function evaluateOffer(
   criteria: CustomerCriteria,
   offer: DealerOffer
@@ -118,6 +160,15 @@ export function evaluateOffer(
     return {
       decision: "clarify",
       reason: "no_price_parsed",
+    };
+  }
+
+  const dealerTactics = analyzeDealerTactics(offer.rawText);
+  if (dealerTactics.length > 0) {
+    return {
+      decision: "reject",
+      reason: "dealer_tactics_detected",
+      dealbreakerHit: dealerTactics.join(", "),
     };
   }
 
@@ -185,7 +236,10 @@ Return strict JSON only, matching this TypeScript type:
   "mustAddProducts": boolean,
   "expirationDate": string | null,
   "stockNumber": string | null,
-  "vin": string | null
+  "vin": string | null,
+  "incentives": string | null,
+  "rebates": string | null,
+  "dealerAddOns": string | null
 }`;
 
   const userPrompt = `Dealer email:\n\n${text}\n\nExtract the values. Use null for unknown numbers.`;
@@ -230,6 +284,9 @@ Return strict JSON only, matching this TypeScript type:
     expirationDate: parsed.expirationDate ?? null,
     stockNumber: parsed.stockNumber ?? null,
     vin: parsed.vin ?? null,
+    incentives: parsed.incentives ?? null,
+    rebates: parsed.rebates ?? null,
+    dealerAddOns: parsed.dealerAddOns ?? null,
     rawText: text,
   };
 
@@ -250,15 +307,17 @@ export function buildFollowupEmail(
   const random = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
   const vehicleDesc = `${criteria.year} ${criteria.make} ${criteria.model}${criteria.trim ? " " + criteria.trim : ""}`;
 
-  let reiterateTerms = '';
-  const dealType = (criteria as any).dealType || 'cash';
-  if (dealType === 'lease') {
-    reiterateTerms = `Just to reiterate, I’m looking for a lease around $${((criteria as any).lease?.maxPayment || 0).toLocaleString()}/month, as little due at signing as possible, for about ${((criteria as any).lease?.months || 36)} months and ${((criteria as any).lease?.miles || 10000).toLocaleString()} miles/year.`;
-  } else if (dealType === 'finance') {
-    reiterateTerms = `Just to reiterate, I’m looking to finance with a monthly payment around $${((criteria as any).finance?.maxPayment || 0).toLocaleString()}, low APR, minimal down, for about ${((criteria as any).finance?.months || 60)} months.`;
-  } else {
-    reiterateTerms = `Just to reiterate, I’m looking for something around $${criteria.targetPrice.toLocaleString()} OTD, ideally with ${criteria.mustHaves.length ? criteria.mustHaves.join(", ") : "my preferred features"}.`;
-  }
+  const dealType = criteria.dealType; // Extract dealType from criteria
+
+  const reiterateTerms = (() => {
+    if (dealType === 'lease') {
+      return `Just to reiterate, I’m looking for a lease around $${((criteria as any).lease?.maxPayment || 0).toLocaleString()}/month, as little due at signing as possible, for about ${((criteria as any).lease?.months || 36)} months and ${((criteria as any).lease?.miles || 10000).toLocaleString()} miles/year.`;
+    } else if (dealType === 'finance') {
+      return `Just to reiterate, I’m looking to finance with a monthly payment around $${((criteria as any).finance?.maxPayment || 0).toLocaleString()}, low APR, minimal down, for about ${((criteria as any).finance?.months || 60)} months.`;
+    } else {
+      return `Just to reiterate, I’m looking for something around $${criteria.targetPrice.toLocaleString()} OTD, ideally with ${criteria.mustHaves.length ? criteria.mustHaves.join(", ") : "my preferred features"}.`;
+    }
+  })();
 
   const negotiationLines = [
     "Is there any flexibility on the price or terms?",

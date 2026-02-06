@@ -36,6 +36,7 @@ export interface ConversationEntry {
   text: string;
   at: string;
   dealerId?: string;
+  messageId?: string;
 }
 
 const leads = new Map<string, Lead>();
@@ -69,6 +70,7 @@ export function appendConversation(id: string, entry: Omit<ConversationEntry, "a
   existing.conversation.push({
     ...entry,
     at: new Date().toISOString(),
+    messageId: entry.messageId || undefined, // Store the messageId if provided
   });
   leads.set(id, existing);
   return existing;
