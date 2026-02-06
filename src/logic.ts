@@ -236,6 +236,7 @@ Return strict JSON only, matching this TypeScript type:
   return offer;
 }
 
+// Updated follow-up email logic to ensure deal-type-specific language and threading
 export function buildFollowupEmail(
   criteria: CustomerCriteria,
   offer: DealerOffer,
@@ -246,10 +247,9 @@ export function buildFollowupEmail(
       ? `$${evaluation.otdEstimate.toLocaleString()}`
       : "the price you mentioned";
 
-  // Dynamic, randomized follow-up templates
   const random = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
   const vehicleDesc = `${criteria.year} ${criteria.make} ${criteria.model}${criteria.trim ? " " + criteria.trim : ""}`;
-  // Deal-type-specific reiteration
+
   let reiterateTerms = '';
   const dealType = (criteria as any).dealType || 'cash';
   if (dealType === 'lease') {
@@ -259,6 +259,7 @@ export function buildFollowupEmail(
   } else {
     reiterateTerms = `Just to reiterate, I’m looking for something around $${criteria.targetPrice.toLocaleString()} OTD, ideally with ${criteria.mustHaves.length ? criteria.mustHaves.join(", ") : "my preferred features"}.`;
   }
+
   const negotiationLines = [
     "Is there any flexibility on the price or terms?",
     "If you can sharpen the numbers a bit, I’d be ready to move quickly.",
@@ -277,9 +278,9 @@ export function buildFollowupEmail(
       body = [
         random(["Hi there,", "Hello,", "Hi,"]),
         "",
-        `Thanks for sending the lease numbers on the ${vehicleDesc}.",
+        `Thanks for sending the lease numbers on the ${vehicleDesc}.`,
         "",
-        `The monthly payment and terms you sent work for me and fit what I was aiming for.",
+        `The monthly payment and terms you sent work for me and fit what I was aiming for.`,
         "",
         "Before I commit, can you confirm there aren’t any surprise fees, add-ons, or changes to the terms?",
         "",
@@ -297,9 +298,9 @@ export function buildFollowupEmail(
       body = [
         random(["Hi there,", "Hello,", "Hi,"]),
         "",
-        `Thanks for sending the finance numbers on the ${vehicleDesc}.",
+        `Thanks for sending the finance numbers on the ${vehicleDesc}.`,
         "",
-        `The monthly payment and terms you sent work for me and fit what I was aiming for.",
+        `The monthly payment and terms you sent work for me and fit what I was aiming for.`,
         "",
         "Before I commit, can you confirm there aren’t any surprise fees, add-ons, or changes to the terms?",
         "",
@@ -317,9 +318,9 @@ export function buildFollowupEmail(
       body = [
         random(["Hi there,", "Hello,", "Hi,"]),
         "",
-        `Thanks for sending the numbers on the ${vehicleDesc}.",
+        `Thanks for sending the numbers on the ${vehicleDesc}.`,
         "",
-        `The out-the-door figure of ${prettyOtd} works for me and fits what I was aiming for.",
+        `The out-the-door figure of ${prettyOtd} works for me and fits what I was aiming for.`,
         "",
         random(["Before I commit, can you confirm there aren’t any surprise fees or mandatory add-ons?", "Just want to double-check there’s nothing extra beyond what you listed."]),
         "",
@@ -378,7 +379,6 @@ export function buildFollowupEmail(
     return { subject, body };
   }
 
-  // Reject/pass (now always reiterates terms)
   const subject = random([
     `Re: ${vehicleDesc} – not quite a fit`,
     `Re: ${vehicleDesc} – going to pass for now`,
@@ -395,8 +395,7 @@ export function buildFollowupEmail(
       "I’m going to hold off for now, but thanks for the details.",
     ]),
     "",
-    // Always reiterate terms
-    `Just so you know, I’m really looking for something around $${criteria.targetPrice.toLocaleString()} OTD${criteria.mustHaves.length ? ", ideally with " + criteria.mustHaves.join(", ") : ""}. If you’re able to get closer to that, I’d be happy to revisit.`,
+    `${reiterateTerms} If you’re able to get closer to that, I’d be happy to revisit.`,
     "",
     "Best,",
     criteria.customerName,

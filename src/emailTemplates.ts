@@ -31,12 +31,30 @@ export interface GeneratedEmail {
 }
 
 const subjectVariants = [
-  (c: CustomerCriteria) =>
-    `Looking for a ${c.year} ${c.make} ${c.model} near ${c.zip}`,
-  (c: CustomerCriteria) =>
-    `${c.year} ${c.make} ${c.model} buyer in ${c.zip} – pricing question`,
-  (c: CustomerCriteria) =>
-    `Question about ${c.year} ${c.make} ${c.model} availability`,
+  (c: CustomerCriteria) => {
+    if (c.dealType === 'lease') {
+      return `Lease inquiry: ${c.year} ${c.make} ${c.model}`;
+    } else if (c.dealType === 'finance') {
+      return `Finance options for ${c.year} ${c.make} ${c.model}`;
+    }
+    return `Looking for a ${c.year} ${c.make} ${c.model} near ${c.zip}`;
+  },
+  (c: CustomerCriteria) => {
+    if (c.dealType === 'lease') {
+      return `Monthly lease pricing on ${c.year} ${c.make} ${c.model}`;
+    } else if (c.dealType === 'finance') {
+      return `Finance details for ${c.year} ${c.make} ${c.model}`;
+    }
+    return `${c.year} ${c.make} ${c.model} buyer in ${c.zip} – pricing question`;
+  },
+  (c: CustomerCriteria) => {
+    if (c.dealType === 'lease') {
+      return `Lease availability for ${c.year} ${c.make} ${c.model}`;
+    } else if (c.dealType === 'finance') {
+      return `Finance availability for ${c.year} ${c.make} ${c.model}`;
+    }
+    return `Question about ${c.year} ${c.make} ${c.model} availability`;
+  },
 ];
 
 const introVariants = [
@@ -87,12 +105,30 @@ const priceBlockVariants = [
 ];
 
 const askBlockVariants = [
-  () =>
-    `\n\nDo you currently have anything in stock that’s a close match, and what would a realistic out-the-door number look like (including dealer fees, but before tax is fine if that’s easier)?`,
-  () =>
-    `\n\nCould you let me know if you have something that fits this description and what your best all-in (or close) number would be?`,
-  () =>
-    `\n\nIf you have something that fits, I’d appreciate a straightforward quote with all dealer fees included so I can compare it apples-to-apples.`,
+  (c: CustomerCriteria) => {
+    if (c.dealType === 'lease') {
+      return `\n\nCould you provide a detailed lease quote, including monthly payment, term, mileage, and any fees?`;
+    } else if (c.dealType === 'finance') {
+      return `\n\nCould you provide a detailed finance quote, including APR, term, down payment, and monthly payment?`;
+    }
+    return `\n\nDo you currently have anything in stock that’s a close match, and what would a realistic out-the-door number look like (including dealer fees, but before tax is fine if that’s easier)?`;
+  },
+  (c: CustomerCriteria) => {
+    if (c.dealType === 'lease') {
+      return `\n\nDo you have any lease specials for this vehicle? I’d like to know the monthly payment, term, and mileage.`;
+    } else if (c.dealType === 'finance') {
+      return `\n\nDo you have any financing options available for this vehicle? I’d like to know the APR, term, and down payment.`;
+    }
+    return `\n\nCould you let me know if you have something that fits this description and what your best all-in (or close) number would be?`;
+  },
+  (c: CustomerCriteria) => {
+    if (c.dealType === 'lease') {
+      return `\n\nIf you have something that fits, I’d appreciate a lease worksheet with all the details.`;
+    } else if (c: CustomerCriteria) {
+      return `\n\nIf you have something that fits, I’d appreciate a straightforward finance quote with all details included.`;
+    }
+    return `\n\nIf you have something that fits, I’d appreciate a straightforward quote with all dealer fees included so I can compare it apples-to-apples.`;
+  },
 ];
 
 const closingVariants = [
