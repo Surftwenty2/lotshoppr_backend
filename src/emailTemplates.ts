@@ -115,8 +115,20 @@ export function generateCustomerEmail(
     `\n\nIdeally, I’d like to wrap this up ${criteria.timelineDescription}.`,
     `\n\nMy timeline is ${criteria.timelineDescription}, but I’m flexible if needed.`,
   ]);
-  const priceBlock = random(priceBlockVariants)(criteria);
-  const askBlock = random(askBlockVariants)();
+  // Determine deal type
+  const dealType = (criteria as any).dealType || 'cash';
+  let priceBlock = '';
+  let askBlock = '';
+  if (dealType === 'lease') {
+    priceBlock = `\n\nI’m hoping to be around $${((criteria as any).lease?.maxPayment || 0).toLocaleString()}/month with as little due at signing as possible, for a ${((criteria as any).lease?.months || 36)}-month lease and ${((criteria as any).lease?.miles || 10000).toLocaleString()} miles/year.`;
+    askBlock = `\n\nCould you send a quote with the monthly payment, due at signing, term, mileage, and any fees or add-ons? If you have a worksheet, that’d be great.`;
+  } else if (dealType === 'finance') {
+    priceBlock = `\n\nI’m looking to finance with a monthly payment around $${((criteria as any).finance?.maxPayment || 0).toLocaleString()}, ideally with a low APR and minimal down payment, for about ${((criteria as any).finance?.months || 60)} months.`;
+    askBlock = `\n\nCould you send a quote with the APR, term, down payment, monthly payment, and all fees?`;
+  } else {
+    priceBlock = random(priceBlockVariants)(criteria);
+    askBlock = random(askBlockVariants)();
+  }
   const closingTemplate = random(closingVariants)();
   const closing = closingTemplate.replace("{{NAME}}", criteria.customerName);
   const body =

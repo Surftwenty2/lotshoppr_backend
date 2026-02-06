@@ -249,7 +249,16 @@ export function buildFollowupEmail(
   // Dynamic, randomized follow-up templates
   const random = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
   const vehicleDesc = `${criteria.year} ${criteria.make} ${criteria.model}${criteria.trim ? " " + criteria.trim : ""}`;
-  const reiterateTerms = `Just to reiterate, I’m looking for something around $${criteria.targetPrice.toLocaleString()} OTD, ideally with ${criteria.mustHaves.length ? criteria.mustHaves.join(", ") : "my preferred features"}.`;
+  // Deal-type-specific reiteration
+  let reiterateTerms = '';
+  const dealType = (criteria as any).dealType || 'cash';
+  if (dealType === 'lease') {
+    reiterateTerms = `Just to reiterate, I’m looking for a lease around $${((criteria as any).lease?.maxPayment || 0).toLocaleString()}/month, as little due at signing as possible, for about ${((criteria as any).lease?.months || 36)} months and ${((criteria as any).lease?.miles || 10000).toLocaleString()} miles/year.`;
+  } else if (dealType === 'finance') {
+    reiterateTerms = `Just to reiterate, I’m looking to finance with a monthly payment around $${((criteria as any).finance?.maxPayment || 0).toLocaleString()}, low APR, minimal down, for about ${((criteria as any).finance?.months || 60)} months.`;
+  } else {
+    reiterateTerms = `Just to reiterate, I’m looking for something around $${criteria.targetPrice.toLocaleString()} OTD, ideally with ${criteria.mustHaves.length ? criteria.mustHaves.join(", ") : "my preferred features"}.`;
+  }
   const negotiationLines = [
     "Is there any flexibility on the price or terms?",
     "If you can sharpen the numbers a bit, I’d be ready to move quickly.",
@@ -258,25 +267,68 @@ export function buildFollowupEmail(
   ];
 
   if (evaluation.decision === "accept") {
-    const subject = random([
-      `Re: ${vehicleDesc} – ready to move forward`,
-      `Re: ${vehicleDesc} – let’s wrap it up`,
-      `Re: ${vehicleDesc} – looks good to me`,
-    ]);
-    const body = [
-      random(["Hi there,", "Hello,", "Hi,"]),
-      "",
-      `Thanks for sending the numbers on the ${vehicleDesc}.`,
-      "",
-      `The out-the-door figure of ${prettyOtd} works for me and fits what I was aiming for.`,
-      "",
-      random(["Before I commit, can you confirm there aren’t any surprise fees or mandatory add-ons?", "Just want to double-check there’s nothing extra beyond what you listed."]),
-      "",
-      random(["If that all checks out, I’m ready to move forward.", "If everything is as described, I’m good to go."]),
-      "",
-      "Thanks!",
-      criteria.customerName,
-    ].join("\n");
+    let subject, body;
+    if (dealType === 'lease') {
+      subject = random([
+        `Re: ${vehicleDesc} – lease terms look good`,
+        `Re: ${vehicleDesc} – ready to lease`,
+        `Re: ${vehicleDesc} – let’s do the lease`,
+      ]);
+      body = [
+        random(["Hi there,", "Hello,", "Hi,"]),
+        "",
+        `Thanks for sending the lease numbers on the ${vehicleDesc}.",
+        "",
+        `The monthly payment and terms you sent work for me and fit what I was aiming for.",
+        "",
+        "Before I commit, can you confirm there aren’t any surprise fees, add-ons, or changes to the terms?",
+        "",
+        "If that all checks out, I’m ready to move forward and sign.",
+        "",
+        "Thanks!",
+        criteria.customerName,
+      ].join("\n");
+    } else if (dealType === 'finance') {
+      subject = random([
+        `Re: ${vehicleDesc} – finance terms look good`,
+        `Re: ${vehicleDesc} – ready to finance`,
+        `Re: ${vehicleDesc} – let’s do the financing`,
+      ]);
+      body = [
+        random(["Hi there,", "Hello,", "Hi,"]),
+        "",
+        `Thanks for sending the finance numbers on the ${vehicleDesc}.",
+        "",
+        `The monthly payment and terms you sent work for me and fit what I was aiming for.",
+        "",
+        "Before I commit, can you confirm there aren’t any surprise fees, add-ons, or changes to the terms?",
+        "",
+        "If that all checks out, I’m ready to move forward and sign.",
+        "",
+        "Thanks!",
+        criteria.customerName,
+      ].join("\n");
+    } else {
+      subject = random([
+        `Re: ${vehicleDesc} – ready to move forward`,
+        `Re: ${vehicleDesc} – let’s wrap it up`,
+        `Re: ${vehicleDesc} – looks good to me`,
+      ]);
+      body = [
+        random(["Hi there,", "Hello,", "Hi,"]),
+        "",
+        `Thanks for sending the numbers on the ${vehicleDesc}.",
+        "",
+        `The out-the-door figure of ${prettyOtd} works for me and fits what I was aiming for.",
+        "",
+        random(["Before I commit, can you confirm there aren’t any surprise fees or mandatory add-ons?", "Just want to double-check there’s nothing extra beyond what you listed."]),
+        "",
+        random(["If that all checks out, I’m ready to move forward.", "If everything is as described, I’m good to go."]),
+        "",
+        "Thanks!",
+        criteria.customerName,
+      ].join("\n");
+    }
     return { subject, body };
   }
 
