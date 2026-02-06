@@ -326,7 +326,7 @@ export function buildFollowupEmail(
     return { subject, body };
   }
 
-  // Reject/pass
+  // Reject/pass (now always reiterates terms)
   const subject = random([
     `Re: ${vehicleDesc} – not quite a fit`,
     `Re: ${vehicleDesc} – going to pass for now`,
@@ -342,6 +342,9 @@ export function buildFollowupEmail(
       "I appreciate the info, but it’s not quite what I’m after.",
       "I’m going to hold off for now, but thanks for the details.",
     ]),
+    "",
+    // Always reiterate terms
+    `Just so you know, I’m really looking for something around $${criteria.targetPrice.toLocaleString()} OTD${criteria.mustHaves.length ? ", ideally with " + criteria.mustHaves.join(", ") : ""}. If you’re able to get closer to that, I’d be happy to revisit.`,
     "",
     "Best,",
     criteria.customerName,
