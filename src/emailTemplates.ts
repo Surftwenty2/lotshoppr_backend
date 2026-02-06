@@ -105,38 +105,26 @@ export function generateCustomerEmail(
   criteria: CustomerCriteria,
   dealer: Dealer
 ): GeneratedEmail {
-  const subject =
-    subjectVariants[Math.floor(Math.random() * subjectVariants.length)](
-      criteria
-    );
-
-  const intro =
-    introVariants[Math.floor(Math.random() * introVariants.length)](criteria);
-
-  const details =
-    interiorSentence(criteria) +
-    mustHaveSentence(criteria) +
-    dealbreakerSentence(criteria);
-
-  const priceBlock =
-    priceBlockVariants[Math.floor(Math.random() * priceBlockVariants.length)](
-      criteria
-    );
-
-  const askBlock =
-    askBlockVariants[Math.floor(Math.random() * askBlockVariants.length)]();
-
-  const closingTemplate =
-    closingVariants[Math.floor(Math.random() * closingVariants.length)]();
+  // More dynamic, natural, and random initial dealer email
+  const random = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
+  const subject = random(subjectVariants)(criteria);
+  const intro = random(introVariants)(criteria);
+  const details = interiorSentence(criteria) + mustHaveSentence(criteria) + dealbreakerSentence(criteria);
+  const timingBlock = random([
+    `\n\nI’m hoping to do something within ${criteria.timelineDescription}.`,
+    `\n\nIdeally, I’d like to wrap this up ${criteria.timelineDescription}.`,
+    `\n\nMy timeline is ${criteria.timelineDescription}, but I’m flexible if needed.`,
+  ]);
+  const priceBlock = random(priceBlockVariants)(criteria);
+  const askBlock = random(askBlockVariants)();
+  const closingTemplate = random(closingVariants)();
   const closing = closingTemplate.replace("{{NAME}}", criteria.customerName);
-
   const body =
     intro +
     details +
-    `\n\nTiming-wise, I’m hoping to do something within ${criteria.timelineDescription}.` +
+    timingBlock +
     priceBlock +
     askBlock +
     closing;
-
   return { subject, body };
 }

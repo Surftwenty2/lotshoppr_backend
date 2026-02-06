@@ -246,70 +246,102 @@ export function buildFollowupEmail(
       ? `$${evaluation.otdEstimate.toLocaleString()}`
       : "the price you mentioned";
 
+  // Dynamic, randomized follow-up templates
+  const random = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+  const vehicleDesc = `${criteria.year} ${criteria.make} ${criteria.model}${criteria.trim ? " " + criteria.trim : ""}`;
+  const reiterateTerms = `Just to reiterate, I’m looking for something around $${criteria.targetPrice.toLocaleString()} OTD, ideally with ${criteria.mustHaves.length ? criteria.mustHaves.join(", ") : "my preferred features"}.`;
+  const negotiationLines = [
+    "Is there any flexibility on the price or terms?",
+    "If you can sharpen the numbers a bit, I’d be ready to move quickly.",
+    "Let me know if there’s any room to work together on this.",
+    "If you can get closer to my target, I’d be happy to discuss next steps.",
+  ];
+
   if (evaluation.decision === "accept") {
-    const subject = `Re: ${criteria.year} ${criteria.make} ${criteria.model} – that works for me`;
+    const subject = random([
+      `Re: ${vehicleDesc} – ready to move forward`,
+      `Re: ${vehicleDesc} – let’s wrap it up`,
+      `Re: ${vehicleDesc} – looks good to me`,
+    ]);
     const body = [
-      "Hi,",
+      random(["Hi there,", "Hello,", "Hi,"]),
       "",
-      `Thanks for sending the numbers on the ${criteria.year} ${criteria.make} ${criteria.model}${criteria.trim ? " " + criteria.trim : ""}.`,
+      `Thanks for sending the numbers on the ${vehicleDesc}.`,
       "",
-      `Based on what you sent, the out-the-door figure of ${prettyOtd} works for me and fits what I was aiming for.`,
+      `The out-the-door figure of ${prettyOtd} works for me and fits what I was aiming for.`,
       "",
-      "Before I commit, can you please confirm there aren’t any additional mandatory add-ons or surprise fees beyond what you already listed?",
+      random(["Before I commit, can you confirm there aren’t any surprise fees or mandatory add-ons?", "Just want to double-check there’s nothing extra beyond what you listed."]),
       "",
-      "If that all checks out, I’m ready to move forward and schedule a time.",
+      random(["If that all checks out, I’m ready to move forward.", "If everything is as described, I’m good to go."]),
       "",
-      `Thanks,`,
+      "Thanks!",
       criteria.customerName,
     ].join("\n");
     return { subject, body };
   }
 
   if (evaluation.decision === "counter" && evaluation.counterPrice != null) {
-    const subject = `Re: ${criteria.year} ${criteria.make} ${criteria.model} – close, but a bit high`;
+    const subject = random([
+      `Re: ${vehicleDesc} – can we get closer?`,
+      `Re: ${vehicleDesc} – price is a bit high`,
+      `Re: ${vehicleDesc} – let’s negotiate`,
+    ]);
     const body = [
-      "Hi,",
+      random(["Hi there,", "Hello,", "Hi,"]),
       "",
-      `I appreciate you sending over the quote on the ${criteria.year} ${criteria.make} ${criteria.model}${criteria.trim ? " " + criteria.trim : ""}.`,
+      `Thanks for the quote on the ${vehicleDesc}.`,
       "",
-      `The only hang-up for me right now is the overall number. Your out-the-door figure of ${prettyOtd} is a bit above where I’m comfortable landing.`,
+      `Your OTD figure of ${prettyOtd} is a bit above where I’m comfortable. ${reiterateTerms}`,
       "",
-      `If you’re able to get closer to about $${evaluation.counterPrice.toLocaleString()} out the door, I’d be a lot more comfortable moving forward quickly.`,
+      `If you’re able to get closer to about $${evaluation.counterPrice.toLocaleString()} OTD, I’d be ready to move forward.`,
       "",
-      "Let me know if there’s any room to tighten things up.",
+      random(negotiationLines),
       "",
-      "Thanks again,",
+      "Thanks again!",
       criteria.customerName,
     ].join("\n");
     return { subject, body };
   }
 
   if (evaluation.decision === "clarify") {
-    const subject = `Re: ${criteria.year} ${criteria.make} ${criteria.model} – can you clarify the total?`;
+    const subject = random([
+      `Re: ${vehicleDesc} – can you clarify the total?`,
+      `Re: ${vehicleDesc} – need a breakdown`,
+      `Re: ${vehicleDesc} – what’s the real OTD?`,
+    ]);
     const body = [
-      "Hi,",
+      random(["Hi there,", "Hello,", "Hi,"]),
       "",
-      `Thanks for the info on the ${criteria.year} ${criteria.make} ${criteria.model}.`,
+      `Thanks for the info on the ${vehicleDesc}.`,
       "",
-      "I may have missed it, but I couldn’t tell exactly what the total out-the-door price would be (with dealer fees included).",
+      "I couldn’t tell exactly what the total OTD price would be (with dealer fees included).",
       "",
-      "Could you send a simple breakdown with the main price, dealer fees, and any required extras so I can see the full picture?",
+      "Could you send a simple breakdown with the main price, dealer fees, and any required extras?",
       "",
-      "Thanks,",
+      random(["That’ll help me compare apples-to-apples.", "Just want to see the full picture before deciding."]),
+      "",
+      "Thanks!",
       criteria.customerName,
     ].join("\n");
     return { subject, body };
   }
 
-  const subject = `Re: ${criteria.year} ${criteria.make} ${criteria.model} – I’m going to pass`;
+  // Reject/pass
+  const subject = random([
+    `Re: ${vehicleDesc} – not quite a fit`,
+    `Re: ${vehicleDesc} – going to pass for now`,
+    `Re: ${vehicleDesc} – thanks for the info`,
+  ]);
   const body = [
-    "Hi,",
+    random(["Hi there,", "Hello,", "Hi,"]),
     "",
     "Thanks for taking the time to send the quote.",
     "",
-    "After looking it over, I’m going to pass for now because it doesn’t quite line up with what I’m trying to do on this purchase.",
-    "",
-    "I appreciate the information either way.",
+    random([
+      "After looking it over, I’m going to pass for now because it doesn’t quite line up with what I’m trying to do.",
+      "I appreciate the info, but it’s not quite what I’m after.",
+      "I’m going to hold off for now, but thanks for the details.",
+    ]),
     "",
     "Best,",
     criteria.customerName,
