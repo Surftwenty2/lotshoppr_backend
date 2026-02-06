@@ -124,7 +124,7 @@ const askBlockVariants = [
   (c: CustomerCriteria) => {
     if (c.dealType === 'lease') {
       return `\n\nIf you have something that fits, I’d appreciate a lease worksheet with all the details.`;
-    } else if (c: CustomerCriteria) {
+    } else if (c.dealType === 'finance') {
       return `\n\nIf you have something that fits, I’d appreciate a straightforward finance quote with all details included.`;
     }
     return `\n\nIf you have something that fits, I’d appreciate a straightforward quote with all dealer fees included so I can compare it apples-to-apples.`;
