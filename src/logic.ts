@@ -330,9 +330,9 @@ export function buildFollowupEmail(
     let subject, body;
     if (dealType === 'lease') {
       subject = random([
-        `Re: ${vehicleDesc} – lease terms look good`,
-        `Re: ${vehicleDesc} – ready to lease`,
-        `Re: ${vehicleDesc} – let’s do the lease`,
+        `Re: ${vehicleDesc} - lease terms look good`,
+        `Re: ${vehicleDesc} - ready to lease`,
+        `Re: ${vehicleDesc} - let’s do the lease`,
       ]);
       body = [
         random(["Hi there,", "Hello,", "Hi,"]),
@@ -350,9 +350,9 @@ export function buildFollowupEmail(
       ].join("\n");
     } else if (dealType === 'finance') {
       subject = random([
-        `Re: ${vehicleDesc} – finance terms look good`,
-        `Re: ${vehicleDesc} – ready to finance`,
-        `Re: ${vehicleDesc} – let’s do the financing`,
+        `Re: ${vehicleDesc} - finance terms look good`,
+        `Re: ${vehicleDesc} - ready to finance`,
+        `Re: ${vehicleDesc} - let’s do the financing`,
       ]);
       body = [
         random(["Hi there,", "Hello,", "Hi,"]),
@@ -370,9 +370,9 @@ export function buildFollowupEmail(
       ].join("\n");
     } else {
       subject = random([
-        `Re: ${vehicleDesc} – ready to move forward`,
-        `Re: ${vehicleDesc} – let’s wrap it up`,
-        `Re: ${vehicleDesc} – looks good to me`,
+        `Re: ${vehicleDesc} - ready to move forward`,
+        `Re: ${vehicleDesc} - let’s wrap it up`,
+        `Re: ${vehicleDesc} - looks good to me`,
       ]);
       body = [
         random(["Hi there,", "Hello,", "Hi,"]),
@@ -394,54 +394,133 @@ export function buildFollowupEmail(
 
   if (evaluation.decision === "counter" && evaluation.counterPrice != null) {
     const subject = random([
-      `Re: ${vehicleDesc} – can we get closer?`,
-      `Re: ${vehicleDesc} – price is a bit high`,
-      `Re: ${vehicleDesc} – let’s negotiate`,
+      `Re: ${vehicleDesc} - can we get closer?`,
+      `Re: ${vehicleDesc} - price is a bit high`,
+      `Re: ${vehicleDesc} - let’s negotiate`,
     ]);
-    const body = [
-      random(["Hi there,", "Hello,", "Hi,"]),
-      "",
-      `Thanks for the quote on the ${vehicleDesc}.`,
-      "",
-      `Your OTD figure of ${prettyOtd} is a bit above where I’m comfortable. ${reiterateTerms}`,
-      "",
-      `If you’re able to get closer to about $${evaluation.counterPrice.toLocaleString()} OTD, I’d be ready to move forward.`,
-      "",
-      random(negotiationLines),
-      "",
-      "Thanks again!",
-      criteria.customerName,
-    ].join("\n");
+    let counterBody: string[];
+    if (dealType === 'lease') {
+      counterBody = [
+        random(["Hi there,", "Hello,", "Hi,"]),
+        "",
+        `Thanks for the lease quote on the ${vehicleDesc}.`,
+        "",
+        `The monthly payment you quoted is a bit above where I'm comfortable. ${reiterateTerms}`,
+        "",
+        `If you can get the monthly payment closer to about $${Math.round(evaluation.counterPrice / 60).toLocaleString()}/month, I'd be ready to move forward.`,
+        "",
+        random(negotiationLines),
+        "",
+        "Thanks again!",
+        criteria.customerName,
+      ];
+    } else if (dealType === 'finance') {
+      counterBody = [
+        random(["Hi there,", "Hello,", "Hi,"]),
+        "",
+        `Thanks for the finance quote on the ${vehicleDesc}.`,
+        "",
+        `The monthly payment you quoted is a bit above where I'm comfortable. ${reiterateTerms}`,
+        "",
+        `If you can get the monthly payment closer to about $${Math.round(evaluation.counterPrice / 60).toLocaleString()}/month, I'd be ready to move forward.`,
+        "",
+        random(negotiationLines),
+        "",
+        "Thanks again!",
+        criteria.customerName,
+      ];
+    } else {
+      counterBody = [
+        random(["Hi there,", "Hello,", "Hi,"]),
+        "",
+        `Thanks for the quote on the ${vehicleDesc}.`,
+        "",
+        `Your OTD figure of ${prettyOtd} is a bit above where I'm comfortable. ${reiterateTerms}`,
+        "",
+        `If you're able to get closer to about $${evaluation.counterPrice.toLocaleString()} OTD, I'd be ready to move forward.`,
+        "",
+        random(negotiationLines),
+        "",
+        "Thanks again!",
+        criteria.customerName,
+      ];
+    }
+    const body = counterBody.join("\n");
     return { subject, body };
   }
 
   if (evaluation.decision === "clarify") {
-    const subject = random([
-      `Re: ${vehicleDesc} – can you clarify the total?`,
-      `Re: ${vehicleDesc} – need a breakdown`,
-      `Re: ${vehicleDesc} – what’s the real OTD?`,
-    ]);
-    const body = [
-      random(["Hi there,", "Hello,", "Hi,"]),
-      "",
-      `Thanks for the info on the ${vehicleDesc}.`,
-      "",
-      "I couldn’t tell exactly what the total OTD price would be (with dealer fees included).",
-      "",
-      "Could you send a simple breakdown with the main price, dealer fees, and any required extras?",
-      "",
-      random(["That’ll help me compare apples-to-apples.", "Just want to see the full picture before deciding."]),
-      "",
-      "Thanks!",
-      criteria.customerName,
-    ].join("\n");
-    return { subject, body };
+    let clarifySubject: string;
+    let clarifyBody: string[];
+    
+    if (dealType === 'lease') {
+      clarifySubject = random([
+        `Re: ${vehicleDesc} - can you clarify the lease terms?`,
+        `Re: ${vehicleDesc} - need more details`,
+        `Re: ${vehicleDesc} - a few questions`,
+      ]);
+      clarifyBody = [
+        random(["Hi there,", "Hello,", "Hi,"]),
+        "",
+        `Thanks for the lease info on the ${vehicleDesc}.`,
+        "",
+        "I want to make sure I understand all the lease terms (monthly payment, due at signing, mileage allowance, etc.).",
+        "",
+        "Could you send a simple breakdown of what's included and any fees or restrictions I should know about?",
+        "",
+        random(["That'll help me compare apples-to-apples.", "Just want to see the full picture before deciding."]),
+        "",
+        "Thanks!",
+        criteria.customerName,
+      ];
+    } else if (dealType === 'finance') {
+      clarifySubject = random([
+        `Re: ${vehicleDesc} - can you clarify the finance terms?`,
+        `Re: ${vehicleDesc} - need more details`,
+        `Re: ${vehicleDesc} - a few questions`,
+      ]);
+      clarifyBody = [
+        random(["Hi there,", "Hello,", "Hi,"]),
+        "",
+        `Thanks for the finance info on the ${vehicleDesc}.`,
+        "",
+        "I want to make sure I understand all the terms (monthly payment, APR, down payment, term, etc.).",
+        "",
+        "Could you send a simple breakdown with the main details?",
+        "",
+        random(["That'll help me compare apples-to-apples.", "Just want to see the full picture before deciding."]),
+        "",
+        "Thanks!",
+        criteria.customerName,
+      ];
+    } else {
+      clarifySubject = random([
+        `Re: ${vehicleDesc} - can you clarify the total?`,
+        `Re: ${vehicleDesc} - need a breakdown`,
+        `Re: ${vehicleDesc} - what's the real OTD?`,
+      ]);
+      clarifyBody = [
+        random(["Hi there,", "Hello,", "Hi,"]),
+        "",
+        `Thanks for the info on the ${vehicleDesc}.`,
+        "",
+        "I couldn't tell exactly what the total OTD price would be (with dealer fees included).",
+        "",
+        "Could you send a simple breakdown with the main price, dealer fees, and any required extras?",
+        "",
+        random(["That'll help me compare apples-to-apples.", "Just want to see the full picture before deciding."]),
+        "",
+        "Thanks!",
+        criteria.customerName,
+      ];
+    }
+    return { subject: clarifySubject, body: clarifyBody.join("\n") };
   }
 
   const subject = random([
-    `Re: ${vehicleDesc} – not quite a fit`,
-    `Re: ${vehicleDesc} – going to pass for now`,
-    `Re: ${vehicleDesc} – thanks for the info`,
+    `Re: ${vehicleDesc} - not quite a fit`,
+    `Re: ${vehicleDesc} - going to pass for now`,
+    `Re: ${vehicleDesc} - thanks for the info`,
   ]);
   const body = [
     random(["Hi there,", "Hello,", "Hi,"]),
